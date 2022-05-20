@@ -13,7 +13,7 @@ import net.javaguides.springboot.service.EmployeeService;
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
 
-	private EmployeeRepository employeeRepository;
+	private final EmployeeRepository employeeRepository;
 	
 	public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
 		super();
@@ -41,4 +41,32 @@ public class EmployeeServiceImpl implements EmployeeService{
 		return employeeRepository.findById(id).orElseThrow(() ->
 				new ResourceNotFoundException("Employee", "Id", id));
 	}
+
+	@Override
+	public Employee updateEmployee(Employee employee, long id) {
+
+		// we need to check whether employee with given id is exist in DB or not
+		Employee existingemployee = employeeRepository.findById(id).orElseThrow(
+				() -> new ResourceNotFoundException("Employee", "Id", id));
+
+		existingemployee.setFirstName(employee.getFirstName());
+		existingemployee.setLastName(employee.getLastName());
+		existingemployee.setEmail(employee.getEmail());
+
+		// save existing employee to DB
+		employeeRepository.save(existingemployee);
+		return existingemployee;
+	}
+
+	@Override
+	public void deleteEmployee(long id) {
+
+		// check wheter a employee exist in a DB or not
+		employeeRepository.findById(id).orElseThrow(() ->
+				new ResourceNotFoundException("Employee", "Id", id));
+
+		employeeRepository.deleteById(id);
+	}
+
+
 }
